@@ -8,7 +8,7 @@ See the COPYING file for details.
 -->
 <head>
   <title>Closure Demos</title>
-  <script src="../base.js"></script>
+  <script src="../lib/closure-library/closure/goog/base.js"></script>
   <script>
     goog.require('goog.ui.tree.TreeControl');
     goog.require('goog.dom');
@@ -169,7 +169,7 @@ See the COPYING file for details.
 
     function initTree() {
       goog.ui.tree.TreeControl.defaultConfig.cleardotPath =
-          'google.github.io/closure-library/source/closure/goog/images/tree/cleardot.gif';
+          '../images/tree/cleardot.gif';
       var tree = new goog.ui.tree.TreeControl('All Demos');
       tree.setIsUserCollapsible(false);
       buildNode(tree, treeData);
@@ -222,13 +222,13 @@ See the COPYING file for details.
 
     .goog-tree-children {
       background-repeat: repeat-y;
-      background-image: url("google.github.io/closure-library/source/closure/goog/images/tree/I.png") !important;
+      background-image: url("../images/tree/I.png") !important;
       background-position-y: 1px !important; /* IE only */
       font: icon;
     }
 
     .goog-tree-icon {
-      background-image:url("google.github.io/closure-library/source/closure/goog/images/tree/tree.png");
+      background-image:url("../images/tree/tree.png");
     }
 
     .goog-tree-item-label {

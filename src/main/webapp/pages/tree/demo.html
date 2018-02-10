@@ -9,7 +9,7 @@ See the COPYING file for details.
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>goog.ui.tree.TreeControl</title>
-  <script src="../../base.js"></script>
+  <script src="../../lib/closure-library/closure/goog/base.js"></script>
   <script>
     goog.require('goog.debug.DivConsole');
     goog.require('goog.debug.Trace');
@@ -64,7 +64,7 @@ See the COPYING file for details.
       goog.debug.Trace.initCurrentTrace();
       var tracerId = goog.debug.Trace.startTracer('makeTree');
       var treeConfig = goog.ui.tree.TreeControl.defaultConfig;
-      treeConfig['cleardotPath'] = '../google.github.io/closure-library/source/closure/goog/images/tree/cleardot.gif';
+      treeConfig['cleardotPath'] = '../../images/tree/cleardot.gif';
       tree = new goog.ui.tree.TreeControl('root', treeConfig);
 
       createTreeFromTestData(tree, testData);
