@@ -15,33 +15,22 @@ var path = require('path');
 var unzip = require('gulp-unzip');
 var util = require('util');
 var zip = require('gulp-zip');
-var wjslint = require('wjslint-gulp');
 
 var config = {
 	path: {
 		src: {
-			less: path.join(__dirname, 'main', 'less'),
-			javascript: {
-				base: path.join(__dirname, 'main', 'js'),
-				entryPoint: path.join(__dirname, 'main', 'js', 'bootcamp', 'todolist', 'todolist-init.js')
-			}
-		},
-		dest: {
-			css: path.join(__dirname, 'main', 'css'),
-			javascript: {
-				compressed: path.join(__dirname, 'main', 'js', 'todolist.js'),
-				sourceMap: path.join(__dirname, 'main', 'js', 'todolist.js.map')
-			}
+			css: path.join(__dirname, 'src', 'main', 'webapp', 'css'),
+			javascript: path.join(__dirname, 'src', 'main', 'webapp', 'js')
 		},
 		lib: {
-			base: path.join(__dirname, 'lib'),
-			closureLibrary: path.join(__dirname, 'lib', 'closure-library'),
-			closureCompiler: path.join(__dirname, 'lib', 'closure-compiler', 'compiler.jar')
+			base: path.join(__dirname, 'src', 'main', 'webapp', 'lib'),
+			closureLibrary: path.join(__dirname, 'src', 'main', 'webapp', 'lib', 'closure-library'),
+			closureCompiler: path.join(__dirname, 'src', 'main', 'webapp', 'lib', 'closure-compiler', 'compiler.jar')
 		},
-		package: 'todolist.zip'
+		package: 'google-closure-ui-helper.zip'
 	},
 	revision: {
-		closureLibrary: '567c440d2c7f2601c970ce40bc650ad2044a77d2'
+		closureLibrary: 'npm-v20171203.0.0'
 	}
 };
 
@@ -83,143 +72,11 @@ gulp.task('init:download-gcc', function(callback) {
 	});
 });
 
-gulp.task('check', ['check:lint', 'check:build']);
-
-gulp.task('check:lint', ['build:clean'], function() {
-	return gulp.src([path.join(config.path.src.javascript.base, '**', '*.js'),
-			'!' + path.basename(config.path.dest.javascript.compressed)])
-		.pipe(debug({title: 'check:lint:'}))
-		.pipe(gjslint({
-			flags: [
-				'--max_line_length 120'
-			]
-		}))
-		.pipe(gjslint.reporter('console'), {fail: true})
-		.pipe(wjslint())
-		.pipe(wjslint.report.toConsole());
-});
-
-gulp.task('check:build', ['build']);
-
-gulp.task('check:individual', ['check:individual:lint', 'check:individual:build']);
-
-gulp.task('check:individual:lint', function() {
-	return gulp.src(path.join(config.path.src.javascript.base, argv.js))
-		.pipe(debug({title: 'check:individual:lint:'}))
-		.pipe(gjslint({
-			flags: [
-				'--max_line_length 120'
-			]
-		}))
-		.pipe(gjslint.reporter('console'), {fail: true})
-		.pipe(wjslint())
-		.pipe(wjslint.report.toConsole());
-});
-
-
-gulp.task('build', ['build:build']);
-
-gulp.task('build:clean', function(callback) {
-	del([
-		config.path.dest.javascript.compressed,
-		config.path.dest.javascript.sourceMap
-	], callback);
-});
-
-gulp.task('build:build', ['build:clean'], function(callback) {
-	var root = config.path.src.javascript.base;
-	var cmd = util.format('python %s/closure/bin/calcdeps.py' +
-			' -i %s' +
-			' -p %s' +
-			' -p %s/closure/' +
-			' -p %s/third_party/' +
-			' -c %s' +
-			' -o compiled' +
-			' -f "--compilation_level=ADVANCED_OPTIMIZATIONS"' +
-			' -f "--warning_level=VERBOSE"' +
-			' -f "--js_output_file=%s"' +
-			' -f "--create_source_map=%s"' +
-			' -f "--output_wrapper=\'%output%//@ sourceMappingURL=%s\'"',
-		path.relative(root, config.path.lib.closureLibrary),
-		path.relative(root, config.path.src.javascript.entryPoint) || '.',
-		path.relative(root, config.path.src.javascript.base) || '.',
-		path.relative(root, config.path.lib.closureLibrary),
-		path.relative(root, config.path.lib.closureLibrary),
-		path.relative(root, config.path.lib.closureCompiler),
-		path.relative(root, config.path.dest.javascript.compressed),
-		path.relative(root, config.path.dest.javascript.sourceMap),
-		path.relative(path.dirname(config.path.dest.javascript.compressed),
-			config.path.dest.javascript.sourceMap));
-	exec(cmd, {cwd: root},
-		function(error, stdout, stderr) {
-			console.log(stdout);
-			console.error(stderr);
-			if (error) {
-				console.error(error);
-			}
-			callback();
-		});
-});
-
-gulp.task('check:individual:build', function(callback) {
-	var root = config.path.src.javascript.base;
-	var cmd = util.format('python %s/closure/bin/calcdeps.py' +
-			' -i %s/%s' +
-			' -p %s' +
-			' -p %s/closure/' +
-			' -p %s/third_party/' +
-			' -c %s' +
-			' -o compiled' +
-			' -f "--compilation_level=ADVANCED_OPTIMIZATIONS"' +
-			' -f "--warning_level=VERBOSE"',
-		path.relative(root, config.path.lib.closureLibrary),
-		path.relative(root, config.path.src.javascript.base) || '.', argv.js,
-		path.relative(root, config.path.src.javascript.base) || '.',
-		path.relative(root, config.path.lib.closureLibrary),
-		path.relative(root, config.path.lib.closureLibrary),
-		path.relative(root, config.path.lib.closureCompiler));
-	exec(cmd, {cwd: root},
-		function(error, stdout, stderr) {
-			//console.log(stdout);
-			console.error(stderr);
-			if (error) {
-				console.error(error);
-			}
-			callback();
-		});
-});
-
-gulp.task('package:clean', function(callback) {
-	del([config.path.package], callback);
-});
-
-gulp.task('package', ['package:clean', 'check'], function() {
-	return gulp.src(['main/js/**/*', 'test/**/*', '*.ods'])
+gulp.task('package', function() {
+	return gulp.src(['src/main/webapp/**/*', '!src/main/webapp/WEB-INF{,/**}'])
 		.pipe(debug({title: 'package:'}))
 		.pipe(zip(config.path.package))
 		.pipe(gulp.dest('.'));
 });
 
-gulp.task('clean', ['build:clean', 'package:clean']);
-gulp.task('clean:all', ['build:clean', 'package:clean', 'clean:lib']);
-
-gulp.task('clean:lib', function(callback) {
-	del([config.path.lib.base], callback);
-});
-
-gulp.task('default', ['build']);
-
-/*
- * Tasks below are for HUE bootcamp course development.
- * Students do not need to use them.
- */
-gulp.task('build:css', ['build:css:clean'], function() {
-	return gulp.src([path.join(config.path.src.less, '**', '*.less'), '!./**/_*.less'])
-		.pipe(debug({title: 'build:css:'}))
-		.pipe(less())
-		.pipe(gulp.dest(config.path.dest.css));
-});
-
-gulp.task('build:css:clean', function(done) {
-	del([config.path.dest.css], done);
-});
+gulp.task('default', ['init']);

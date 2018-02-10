@@ -9,3 +9,5 @@ out/
 
 node_modules
 
+*.zip
+src/main/webapp/lib
