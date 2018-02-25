@@ -76,6 +76,7 @@ while (change) {
   change = false;
   levels[i] = [];
   var newVisited = goog.array.clone(visited);
+  goog.dependencies_ = goog.dependencies_ || goog.debugLoader_.dependencies_;
   goog.object.forEach(goog.dependencies_.nameToPath, function(path, ns) {
     var deps = goog.object.clone(goog.dependencies_.requires[path]);
     goog.array.forEach(newVisited, function(value) {
